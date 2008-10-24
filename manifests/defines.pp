@@ -30,7 +30,7 @@ define ibackup::backup_target(
 define ibackup::backup_disk(
     $device
 ){
-    include ibackup::disk
+    include ibackup::disks
 
     file{"/data/backup_${name}":
         ensure => directory,
