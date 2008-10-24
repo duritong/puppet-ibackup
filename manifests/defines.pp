@@ -2,7 +2,7 @@
 
 define ibackup::backup_target(
     $sshkey,
-    $sshkey_tape = 'ssh-rsa',
+    $sshkey_type = 'ssh-rsa',
     $target
 ){
     include ibackup::host
