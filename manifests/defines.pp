@@ -28,7 +28,8 @@ define ibackup::backup_target(
 }
 
 define ibackup::backup_disk(
-    $device
+    $device,
+    $fstype = 'ext3'
 ){
     include ibackup::disks
 
@@ -40,7 +41,7 @@ define ibackup::backup_disk(
     mount{"/data/backup_${name}":
         device => $device,
         ensure => mounted,
-        fstype => 'ext3',
+        fstype => $fstype,
         options => 'nodev,noexec',
         require => File["/data/backup_${name}"],
     }
