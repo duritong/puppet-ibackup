@@ -21,8 +21,20 @@ class ibackup::simplebackup {
         owner => root, group => 0, mode => 0600;
     }
 
-    file{'/etc/cron.daily/ext_backup.sh':
-        ensure => '/e/backup/bin/ext_backup.sh',
-        require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup.sh'] ],
+    case $kernel {
+        default: {
+            file{'/etc/cron.daily/ext_backup.sh':
+                ensure => '/e/backup/bin/ext_backup.sh',
+                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup.sh'] ],
+            }
+        }
+        openbsd: {
+            cron { 'ibackup_job':
+                command => '/e/backup/bin/ext_backup.sh',
+                minute => '15',
+                hour => '2',
+                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup.sh'] ],
+            }  
+        }
     }
 }
