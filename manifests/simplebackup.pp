@@ -1,16 +1,11 @@
 # manifests/simplebackup.pp
 
 class ibackup::simplebackup {
-    include securefile
+    include ibackup::simpledisks
+
     include rsync::client
     if $use_shorewall {
         include shorewall::backup
-    }
-
-    file{ [ '/e/backup', '/e/backup/bin', '/e/backup/data', '/e/backup/keys' ]:
-        ensure => directory,
-        require => File['/e/.issecure'],
-        owner => root, group => 0, mode => 0700;
     }
 
     file{'/e/backup/bin/ext_backup.sh':
