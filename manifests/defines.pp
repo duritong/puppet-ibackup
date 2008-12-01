@@ -7,7 +7,7 @@ define ibackup::backup_target(
 ){
     include ibackup::host
 
-    user::define_user{"$name":
+    user::managed{"$name":
             groups => 'backup',
             require => Group['backup'],
     }
