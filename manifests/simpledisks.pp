@@ -3,7 +3,9 @@
 class ibackup::simpledisks {
     include securefile
 
-    group{'ibackup': }
+    group{'ibackup':
+        ensure => present,
+    }
 
     file{'/e/backup':
         ensure => directory,
