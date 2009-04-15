@@ -1,15 +1,21 @@
 # manifests/defines.pp
 
-define ibackup::backup_target(
+# user_password: a password for the user,
+#                so users can directly login.
+define ibackup::target(
     $sshkey,
     $sshkey_type = 'ssh-rsa',
+    $user_password,
+    $user_password_crypted = true,
     $target
 ){
     include ibackup::host
 
     user::managed{"$name":
-            groups => 'backup',
-            require => Group['backup'],
+        groups => 'backup',
+        require => Group['backup'],
+        password => $user_password,
+        password_crypted => $user_password_crypted,
     }
 
     file{"$target":
@@ -21,13 +27,13 @@ define ibackup::backup_target(
     sshd::ssh_authorized_key{"backupkey_${name}":
         type => $sshkey_type,
         user => $name,
-        key => $sshkey,    
+        key => $sshkey,
         options => ["command=\"/usr/local/bin/rrsync ${target}\"",'no-pty','no-X11-forwarding','no-agent-forwarding','no-port-forwarding'],
         require => File["$target"],
     }
 }
 
-define ibackup::backup_disk(
+define ibackup::disk(
     $device,
     $fstype = 'ext3'
 ){
