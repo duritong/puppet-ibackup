@@ -18,7 +18,7 @@ class ibackup::simplebackup {
     }
 
     file{'/e/backup/bin/ext_backup.config':
-        source => "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.conf",
+        source => "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.config",
         require => File['/e/backup/bin'],
         owner => root, group => 0, mode => 0600;
     }
