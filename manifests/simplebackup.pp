@@ -1,5 +1,7 @@
-# manifests/simplebackup.pp
 
+# this class deploys a basic backup script
+# on the host. The script is either choosen by
+# the fqdn of the host or by a variable $ibackup_type.
 class ibackup::simplebackup {
     include ibackup::simpledisks
 
@@ -9,9 +11,16 @@ class ibackup::simplebackup {
     }
 
     file{'/e/backup/bin/ext_backup.sh':
-        source => "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.sh",
+        source => [ "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.sh",
+                    "puppet://$server/files/ibackup/scripts/${ibackup_type}/ext_backup.sh" ],
         require => File['/e/backup/bin'],
         owner => root, group => 0, mode => 0700;
+    }
+
+    file{'/e/backup/bin/ext_backup.config':
+        source => "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.conf",
+        require => File['/e/backup/bin'],
+        owner => root, group => 0, mode => 0600;
     }
 
     securefile::deploy { 'backup1.glei.ch_ssh_key':
