@@ -7,7 +7,7 @@ class ibackup::simplebackup {
 
     include rsync::client
     if $use_shorewall {
-        include shorewall::backup
+        include shorewall::rules::out::ibackup
     }
 
     file{'/e/backup/bin/ext_backup.sh':
