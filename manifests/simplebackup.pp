@@ -11,14 +11,14 @@ class ibackup::simplebackup {
     }
 
     file{'/e/backup/bin/ext_backup.sh':
-        source => [ "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.sh",
-                    "puppet://$server/files/ibackup/scripts/${ibackup_type}/ext_backup.sh" ],
+        source => [ "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.sh",
+                    "puppet://$server/modules/site-ibackup/scripts/${ibackup_type}/ext_backup.sh" ],
         require => File['/e/backup/bin'],
         owner => root, group => 0, mode => 0700;
     }
 
     file{'/e/backup/bin/ext_backup.config':
-        source => "puppet://$server/files/ibackup/scripts/${fqdn}/ext_backup.config",
+        source => "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
         require => File['/e/backup/bin'],
         owner => root, group => 0, mode => 0600;
     }
