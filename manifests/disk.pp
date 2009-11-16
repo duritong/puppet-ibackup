@@ -1,6 +1,7 @@
 define ibackup::disk(
     $device,
-    $fstype = 'ext3'
+    $fstype = 'ext3',
+    $options = 'noatime,nodev,noexec'
 ){
     include ibackup::disks
 
@@ -13,7 +14,7 @@ define ibackup::disk(
         device => $device,
         ensure => mounted,
         fstype => $fstype,
-        options => 'nodev,noexec',
+        options => $options,
         require => File["/data/backup_${name}"],
     }
 }
