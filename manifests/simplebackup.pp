@@ -10,16 +10,17 @@ class ibackup::simplebackup {
         include shorewall::rules::out::ibackup
     }
 
-    file{'/e/backup/bin/ext_backup.sh':
-        source => [ "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.sh",
-                    "puppet://$server/modules/site-ibackup/scripts/${ibackup_type}/ext_backup.sh" ],
-        require => File['/e/backup/bin'],
+    file{'/e/backup/bin/ext_backup':
+        source => [ "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup",
+                    "puppet://$server/modules/site-ibackup/scripts/${ibackup_type}/ext_backup" ],
         owner => root, group => 0, mode => 0700;
+    }
+    file{'/e/backup/bin/ext_backup.sh':
+      ensure => absent,
     }
 
     file{'/e/backup/bin/ext_backup.config':
         source => "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
-        require => File['/e/backup/bin'],
         owner => root, group => 0, mode => 0600;
     }
 
@@ -32,17 +33,20 @@ class ibackup::simplebackup {
 
     case $kernel {
         default: {
+            file{'/etc/cron.daily/ext_backup':
+                ensure => '/e/backup/bin/ext_backup',
+                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup'] ],
+            }
             file{'/etc/cron.daily/ext_backup.sh':
-                ensure => '/e/backup/bin/ext_backup.sh',
-                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup.sh'] ],
+              ensure => absent,
             }
         }
         openbsd: {
             cron { 'ibackup_job':
-                command => '/e/backup/bin/ext_backup.sh',
+                command => '/e/backup/bin/ext_backup',
                 minute => '15',
                 hour => '2',
-                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup.sh'] ],
+                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup'] ],
             }  
         }
     }
