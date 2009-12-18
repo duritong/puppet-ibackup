@@ -52,9 +52,6 @@ define ibackup::target(
         recurse => true,
         before => User["$name"],
       }
-      Sshd::Ssh_authorized_key["backupkey_${name}"]{
-        before => User["$name"],
-      }
     } else {
       File["$target"]{
         require => User["$name"],
