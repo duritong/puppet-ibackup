@@ -1,6 +1,7 @@
 # user_password: a password for the user,
 #                so users can directly login.
 define ibackup::target(
+    $ensure = 'present',
     $sshkey,
     $sshkey_type = 'ssh-rsa',
     $user_password,
@@ -10,6 +11,7 @@ define ibackup::target(
     include ibackup::host
 
     user::managed{"$name":
+        ensure => $ensure,
         groups => 'backup',
         require => Group['backup'],
         password => $user_password,
@@ -17,12 +19,25 @@ define ibackup::target(
     }
 
     file{"$target":
-        ensure => directory,
+        ensure => $ensure ? {
+          'present' => directory,
+          default => absent
+        },
         require => User["$name"],
-        owner => $name, group => 0, mode => 0700;
+        owner => $name, group => 0, mode => 0600;
+    }
+
+    if ($ensure!='present'){
+      File["$target"]{
+        purge => true,
+        force => true,
+        backup => false,
+        recurse => true,
+      }
     }
 
     sshd::ssh_authorized_key{"backupkey_${name}":
+        ensure => $ensure,
         type => $sshkey_type,
         user => $name,
         key => $sshkey,
