@@ -1,13 +1,25 @@
 # user_password: a password for the user,
 #                so users can directly login.
+#                Mandatory if ensure is present.
+# sshkey: the ssh key for the user, is mandatory if
+#         ensure is present.
+# target: On which directory the backup user has access.
+#         Required.
 define ibackup::target(
     $ensure = 'present',
-    $sshkey,
+    $sshkey = 'absent',
     $sshkey_type = 'ssh-rsa',
-    $user_password,
+    $user_password = 'absent',
     $user_password_crypted = true,
     $target
 ){
+
+    if ($ensure=='present'){
+      if ($sshkey=='absent') or ($user_password=='absent'){
+        fail("You must set \$sshkey and \$user_password on Ibackup::Target[${name}]!")
+      }
+    }
+
     include ibackup::host
 
     user::managed{"$name":
