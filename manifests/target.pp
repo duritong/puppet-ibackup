@@ -35,8 +35,13 @@ define ibackup::target(
           'present' => directory,
           default => absent
         },
-        require => User["$name"],
-        owner => $name, group => 0, mode => 0600;
+    }
+
+    sshd::ssh_authorized_key{"backupkey_${name}":
+        ensure => $ensure,
+        type => $sshkey_type,
+        user => $name,
+        options => ["command=\"/usr/local/bin/rrsync ${target}\"",'no-pty','no-X11-forwarding','no-agent-forwarding','no-port-forwarding'],
     }
 
     if ($ensure!='present'){
@@ -45,15 +50,19 @@ define ibackup::target(
         force => true,
         backup => false,
         recurse => true,
+        before => User["$name"],
       }
-    }
-
-    sshd::ssh_authorized_key{"backupkey_${name}":
-        ensure => $ensure,
-        type => $sshkey_type,
-        user => $name,
+      Sshd::Ssh_authorized_key["backupkey_${name}"]{
+        before => User["$name"],
+      }
+    } else {
+      File["$target"]{
+        require => User["$name"],
+        owner => $name, group => 0, mode => 0600,
+      }
+      Sshd::Ssh_authorized_key["backupkey_${name}"]{
         key => $sshkey,
-        options => ["command=\"/usr/local/bin/rrsync ${target}\"",'no-pty','no-X11-forwarding','no-agent-forwarding','no-port-forwarding'],
         require => File["$target"],
+      }
     }
 }
