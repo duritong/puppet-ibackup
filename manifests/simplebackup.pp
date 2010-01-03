@@ -20,7 +20,8 @@ class ibackup::simplebackup {
     }
 
     file{'/e/backup/bin/ext_backup.config':
-        source => "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
+        source => [ "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
+                    "puppet://$server/modules/site-ibackup/scripts/${ibackup_type}/ext_backup.config" ],
         owner => root, group => 0, mode => 0600;
     }
 
