@@ -11,8 +11,8 @@ class ibackup::simplebackup {
     }
 
     file{'/e/backup/bin/ext_backup':
-        source => [ "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup",
-                    "puppet://$server/modules/site-ibackup/scripts/${ibackup_type}/ext_backup" ],
+        source => [ "puppet:///modules/site-ibackup/scripts/${fqdn}/ext_backup",
+                    "puppet:///modules/site-ibackup/scripts/${ibackup_type}/ext_backup" ],
         owner => root, group => 0, mode => 0700;
     }
     file{'/e/backup/bin/ext_backup.sh':
@@ -20,8 +20,8 @@ class ibackup::simplebackup {
     }
 
     file{'/e/backup/bin/ext_backup.config':
-        source => [ "puppet://$server/modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
-                    "puppet://$server/modules/site-ibackup/scripts/${ibackup_type}/ext_backup.config" ],
+        source => [ "puppet:///modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
+                    "puppet:///modules/site-ibackup/scripts/${ibackup_type}/ext_backup.config" ],
         owner => root, group => 0, mode => 0600;
     }
 
