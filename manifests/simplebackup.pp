@@ -2,7 +2,12 @@
 # this class deploys a basic backup script
 # on the host. The script is either choosen by
 # the fqdn of the host or by a variable $ibackup_type.
-class ibackup::simplebackup {
+class ibackup::simplebackup(
+  $backup_host,
+  $ibackup_type,
+  $ssh_key_basepath = "/etc/puppet/modules/site-securefile/files",
+  $disk_target = "/srv/backups"
+) {
     include ibackup::simpledisks
 
     include rsync::client
@@ -25,18 +30,27 @@ class ibackup::simplebackup {
         owner => root, group => 0, mode => 0600;
     }
 
-    securefile::deploy { 'backup1.glei.ch_ssh_key':
-        source  => "backup/keys/${fqdn}/backup1.glei.ch",
-        path    => 'backup/keys/backup1.glei.ch',
+    # this will generate the source for the deply and the public key for the disk
+    $ssh_keys = ssh_keygen("${$ssh_key_basepath}/backup/keys/${fqdn}/${backup_host}")
+
+    securefile::deploy { "${backup_host}_ssh_key":
+        source  => "backup/keys/${fqdn}/${backup_host}",
+        path    => "backup/keys/${backup_host}",
         require => File['/e/backup/keys'],
         owner => root, group => 0, mode => 0600;
+    }
+
+    @@ibackup::disk{$fqdn:
+      sshkey => $ssh_keys[1],
+      target => "$disk_target/${$fqdn}",
+      tag => $backup_host,
     }
 
     case $kernel {
         default: {
             file{'/etc/cron.daily/ext_backup':
                 ensure => '/e/backup/bin/ext_backup',
-                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup'] ],
+                require => [ Securefile::Deploy["${backup_host}_ssh_key"], File['/e/backup/bin/ext_backup'] ],
             }
             file{'/etc/cron.daily/ext_backup.sh':
               ensure => absent,
@@ -47,7 +61,7 @@ class ibackup::simplebackup {
                 command => '/e/backup/bin/ext_backup',
                 minute => '15',
                 hour => '2',
-                require => [ Securefile::Deploy['backup1.glei.ch_ssh_key'], File['/e/backup/bin/ext_backup'] ],
+                require => [ Securefile::Deploy["${backup_host}_ssh_key"], File['/e/backup/bin/ext_backup'] ],
             }  
         }
     }
