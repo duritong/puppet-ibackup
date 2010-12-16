@@ -1,10 +1,10 @@
 
 # this class deploys a basic backup script
 # on the host. The script is either choosen by
-# the fqdn of the host or by a variable $ibackup_type.
+# the fqdn of the host or by a variable $type.
 class ibackup::simplebackup(
   $backup_host,
-  $ibackup_type,
+  $type,
   $ssh_key_basepath = "/etc/puppet/modules/site-securefile/files",
   $disk_target = "/srv/backups"
 ) {
@@ -17,7 +17,7 @@ class ibackup::simplebackup(
 
     file{'/e/backup/bin/ext_backup':
         source => [ "puppet:///modules/site-ibackup/scripts/${fqdn}/ext_backup",
-                    "puppet:///modules/site-ibackup/scripts/${ibackup_type}/ext_backup" ],
+                    "puppet:///modules/site-ibackup/scripts/${type}/ext_backup" ],
         owner => root, group => 0, mode => 0700;
     }
     file{'/e/backup/bin/ext_backup.sh':
@@ -26,7 +26,7 @@ class ibackup::simplebackup(
 
     file{'/e/backup/bin/ext_backup.config':
         source => [ "puppet:///modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
-                    "puppet:///modules/site-ibackup/scripts/${ibackup_type}/ext_backup.config" ],
+                    "puppet:///modules/site-ibackup/scripts/${type}/ext_backup.config" ],
         owner => root, group => 0, mode => 0600;
     }
 
