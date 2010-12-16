@@ -40,7 +40,7 @@ class ibackup::simplebackup(
         owner => root, group => 0, mode => 0600;
     }
 
-    @@ibackup::disk{$fqdn:
+    @@ibackup::target{$fqdn:
       sshkey => $ssh_keys[1],
       target => "$disk_target/${$fqdn}",
       tag => $backup_host,
