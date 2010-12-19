@@ -41,8 +41,10 @@ class ibackup::simplebackup(
         owner => root, group => 0, mode => 0600;
     }
 
+    $public_key = split($ssh_keys[1],' ')
     @@ibackup::target{$fqdn:
-      sshkey => $ssh_keys[1],
+      sshkey_type => $public_key[0],
+      sshkey => $public_key[1],
       target => "$disk_target/${$fqdn}",
       tag => $backup_host,
     }
