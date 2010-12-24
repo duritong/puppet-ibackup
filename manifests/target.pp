@@ -20,8 +20,6 @@ define ibackup::target(
       }
     }
 
-    include ibackup::host
-
     user::managed{"$name":
         ensure => $ensure,
         groups => 'backup',

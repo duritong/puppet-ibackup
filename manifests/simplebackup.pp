@@ -49,6 +49,8 @@ class ibackup::simplebackup(
     tag => $backup_host,
   }
 
+  Sshkey <<| tag == $backup_host |>>
+
   case $kernel {
     default: {
       file{'/etc/cron.daily/ext_backup':
