@@ -13,7 +13,7 @@ class ibackup::host(
 
   @@sshkey{$backup_domain:
     type => ssh-rsa,
-    key => $sshrsakey_key,
+    key => $sshrsakeykey,
     ensure => present,
     tag => $backup_domain,
   }
