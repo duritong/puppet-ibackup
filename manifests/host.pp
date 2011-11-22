@@ -12,7 +12,7 @@ class ibackup::host(
   Ibackup::Target<<| tag == $backup_domain |>>
 
   @@sshkey{$backup_domain:
-    type => 'ssh-rsa'',
+    type => 'ssh-rsa',
     key => $sshrsakey,
     ensure => present,
     tag => $backup_domain,
