@@ -20,15 +20,18 @@ define ibackup::target(
       }
     }
 
-    user::managed{"$name":
+    user::managed{$name:
         ensure => $ensure,
         groups => 'backup',
         require => Group['backup'],
-        password => $user_password,
+        password => $user_password ? {
+            'trocla' => trocla("ibackup_${name}",'sha512crypt'),
+            default => $user_password
+        },
         password_crypted => $user_password_crypted,
     }
 
-    file{"$target":
+    file{$target:
         ensure => $ensure ? {
           'present' => directory,
           default => absent
@@ -36,7 +39,7 @@ define ibackup::target(
     }
 
     if ($ensure!='present'){
-      File["$target"]{
+      File[$target]{
         purge => true,
         force => true,
         backup => false,
@@ -44,7 +47,7 @@ define ibackup::target(
         before => User["$name"],
       }
     } else {
-      File["$target"]{
+      File[$target]{
         require => User["$name"],
         owner => $name, group => 0, mode => 0600,
       }
