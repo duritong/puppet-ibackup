@@ -20,8 +20,12 @@ define ibackup::sftpuser(
     homedir => "${base_path}/${user_name}"
   }
 
-  file{"${base_path}/${user_name}/backup":
-    ensure => directory,
-    owner => $user_name, group => $user_name, mode => 0700;
+  file{
+    "${base_path}/${user_name}":
+      ensure => directory,
+      owner => root, group => $user_name, mode => 0750;
+    "${base_path}/${user_name}/backup":
+      ensure => directory,
+      owner => $user_name, group => $user_name, mode => 0700;
   }
 }
