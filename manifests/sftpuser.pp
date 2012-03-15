@@ -4,7 +4,7 @@ define ibackup::sftpuser(
   $password = 'trocla'
 ){
   $base_path = hiera('ibackup_sftpuser_base_path','/srv/backup')
-  $user_name = "sb_$name"
+  $user_name = "sb_${name}"
   user::sftp_only{$user_name:
     ensure => $ensure,
     uid => $uid ? {
