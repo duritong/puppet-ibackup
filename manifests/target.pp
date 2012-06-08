@@ -48,7 +48,7 @@ define ibackup::target(
       }
     } else {
       File[$target]{
-        require => User["$name"],
+        require => User[$name],
         owner => $name, group => 0, mode => 0600,
       }
       sshd::ssh_authorized_key{"backupkey_${name}":

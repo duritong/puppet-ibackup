@@ -5,19 +5,19 @@
 class ibackup::simplebackup(
   $backup_host,
   $type,
-  $ssh_key_basepath = "/etc/puppet/modules/site-securefile/files",
+  $ssh_key_basepath = "/etc/puppet/modules/site_securefile/files",
   $disk_target = "/srv/backups"
 ) {
   include ibackup::simpledisks
 
   include rsync::client
-  if $use_shorewall {
+  if hiera('use_shorewall',false) {
     include shorewall::rules::out::ibackup
   }
 
   file{'/e/backup/bin/ext_backup':
-    source => [ "puppet:///modules/site-ibackup/scripts/${fqdn}/ext_backup",
-                "puppet:///modules/site-ibackup/scripts/${type}/ext_backup" ],
+    source => [ "puppet:///modules/site_ibackup/scripts/${::fqdn}/ext_backup",
+                "puppet:///modules/site_ibackup/scripts/${type}/ext_backup" ],
     owner => root, group => 0, mode => 0700;
   }
   file{'/e/backup/bin/ext_backup.sh':
@@ -25,33 +25,33 @@ class ibackup::simplebackup(
   }
 
   file{'/e/backup/bin/ext_backup.config':
-    source => [ "puppet:///modules/site-ibackup/scripts/${fqdn}/ext_backup.config",
-                "puppet:///modules/site-ibackup/scripts/${type}/ext_backup.config",
-                'puppet:///modules/site-ibackup/scripts/ext_backup.config' ],
+    source => [ "puppet:///modules/site_ibackup/scripts/${::fqdn}/ext_backup.config",
+                "puppet:///modules/site_ibackup/scripts/${type}/ext_backup.config",
+                'puppet:///modules/site_ibackup/scripts/ext_backup.config' ],
     owner => root, group => 0, mode => 0600;
   }
 
   # this will generate the source for the deply and the public key for the disk
-  $ssh_keys = ssh_keygen("${$ssh_key_basepath}/backup/keys/${fqdn}/${backup_host}")
+  $ssh_keys = ssh_keygen("${$ssh_key_basepath}/backup/keys/${::fqdn}/${backup_host}")
 
   securefile::deploy { "${backup_host}_ssh_key":
-    source  => "backup/keys/${fqdn}/${backup_host}",
+    source  => "backup/keys/${::fqdn}/${backup_host}",
     path  => "backup/keys/${backup_host}",
     require => File['/e/backup/keys'],
     owner => root, group => 0, mode => 0600;
   }
 
   $public_key = split($ssh_keys[1],' ')
-  @@ibackup::target{$fqdn:
+  @@ibackup::target{$::fqdn:
     sshkey_type => $public_key[0],
     sshkey => $public_key[1],
-    target => "$disk_target/${$fqdn}",
+    target => "$disk_target/${$::fqdn}",
     tag => $backup_host,
   }
 
   Sshkey <<| tag == $backup_host |>>
 
-  case $kernel {
+  case $::kernel {
     default: {
       file{'/etc/cron.daily/ext_backup':
         ensure => '/e/backup/bin/ext_backup',
@@ -67,7 +67,7 @@ class ibackup::simplebackup(
         minute => '15',
         hour => '2',
         require => [ Securefile::Deploy["${backup_host}_ssh_key"], File['/e/backup/bin/ext_backup'] ],
-      }  
+      }
     }
   }
 }
