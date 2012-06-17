@@ -7,14 +7,14 @@ class ibackup::simplebackup(
   $type,
   $ssh_key_basepath = '/etc/puppet/modules/site_securefile/files',
   $disk_target = '/srv/backups',
-  $manage_shorewall = false
+  $shorewall_backuphost = false
 ) {
   include ibackup::simpledisks
 
   include rsync::client
-  if $manage_shorewall {
+  if $shorewall_backuphost {
     class{'shorewall::rules::out::ibackup':
-      backup_host => $manage_shorewall
+      backup_host => $shorewall_backuphost
     }
   }
 
