@@ -38,7 +38,7 @@ class ibackup::simplebackup(
   $ssh_keys = ssh_keygen("${$ssh_key_basepath}/backup/keys/${::fqdn}/${backup_host}")
 
   securefile::deploy { "${backup_host}_ssh_key":
-    source  => "backup/keys/${::fqdn}/${backup_host}",
+    content  => $ssh_keys[0],
     path  => "backup/keys/${backup_host}",
     require => File['/e/backup/keys'],
     owner => root, group => 0, mode => 0600;
@@ -48,7 +48,7 @@ class ibackup::simplebackup(
   @@ibackup::target{$::fqdn:
     sshkey_type => $public_key[0],
     sshkey => $public_key[1],
-    target => "$disk_target/${$::fqdn}",
+    target => "${disk_target}/${$::fqdn}",
     tag => $backup_host,
   }
 
