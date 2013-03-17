@@ -4,6 +4,7 @@ class ibackup::simpledisks {
 
   group{'ibackup':
     ensure  => present,
+    gid     => 9998,
   }
 
   file{
