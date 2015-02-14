@@ -9,7 +9,6 @@ define ibackup::target(
   $target,
   $ensure                 = 'present',
   $sshkey                 = 'absent',
-  $sshkey_type            = 'ssh-rsa',
   $user_password          = 'absent',
   $user_password_crypted  = true,
 ){
@@ -24,11 +23,12 @@ define ibackup::target(
     default   => $user_password
   }
   user::managed{$name:
-    ensure            => $ensure,
-    groups            => 'backup',
-    require           => Group['backup'],
-    password          => $password,
-    password_crypted  => $user_password_crypted,
+    ensure           => $ensure,
+    groups           => 'backup',
+    require          => Group['backup'],
+    password         => $password,
+    password_crypted => $user_password_crypted,
+    purge_ssh_keys   => true,
   }
 
   $ensure_target = $ensure ? {
@@ -59,10 +59,9 @@ define ibackup::target(
       group   => 0,
       mode    => '0600',
     }
-    sshd::ssh_authorized_key{"backupkey_${name}":
+    sshd::authorized_key{"backupkey_${name}":
       ensure  => $ensure,
       key     => $sshkey,
-      type    => $sshkey_type,
       user    => $name,
       options => ["command=\"/usr/local/bin/rrsync ${target}\"",
         'no-pty','no-X11-forwarding','no-agent-forwarding',
