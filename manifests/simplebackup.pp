@@ -6,7 +6,8 @@ class ibackup::simplebackup(
   $type,
   $ssh_key_basepath     = '/etc/puppet/modules/site_securefile/files',
   $disk_target          = '/srv/backups',
-  $shorewall_backuphost = false
+  $shorewall_backuphost = false,
+  $config_content       = undef,
 ) {
   include ::ibackup::simpledisks
 
@@ -25,12 +26,20 @@ class ibackup::simplebackup(
       group  => 0,
       mode   => '0700';
     '/e/backup/bin/ext_backup.config':
-      source  => ["puppet:///modules/site_ibackup/scripts/${::fqdn}/ext_backup.config",
-                  "puppet:///modules/site_ibackup/scripts/${type}/ext_backup.config",
-                  'puppet:///modules/site_ibackup/scripts/ext_backup.config' ],
       owner   => root,
       group   => 0,
       mode    => '0600';
+  }
+  if $config_content {
+    File['/e/backup/bin/ext_backup.config']{
+      content => $config_content,
+    }
+  } else {
+    File['/e/backup/bin/ext_backup.config']{
+      source  => ["puppet:///modules/site_ibackup/scripts/${::fqdn}/ext_backup.config",
+                  "puppet:///modules/site_ibackup/scripts/${type}/ext_backup.config",
+                  'puppet:///modules/site_ibackup/scripts/ext_backup.config' ],
+    }
   }
 
   # this will generate the source for the deply and the public key for the disk
