@@ -1,7 +1,6 @@
-# manifests/host.pp
-
+# a backup host
 class ibackup::host(
-  $backup_domain
+  $backup_domain = "backup.${domain}",
 ) {
   include rsync::rrsync
 
@@ -12,9 +11,9 @@ class ibackup::host(
   Ibackup::Target<<| tag == $backup_domain |>>
 
   @@sshkey{$backup_domain:
-    type => 'ssh-rsa',
-    key => $sshrsakey,
+    type   => 'ssh-rsa',
+    key    => $sshrsakey,
     ensure => present,
-    tag => $backup_domain,
+    tag    => $backup_domain,
   }
 }
