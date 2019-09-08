@@ -4,11 +4,12 @@
 class ibackup::simplebackup(
   $backup_host,
   $type,
-  $ssh_key_basepath     = '/etc/puppet/modules/site_securefile/files',
-  $disk_target          = '/srv/backups',
-  $user_password        = 'absent',
-  $shorewall_backuphost = false,
-  $config_content       = undef,
+  $ssh_key_basepath      = '/etc/puppet/modules/site_securefile/files',
+  $disk_target           = '/srv/backups',
+  $user_password         = 'absent',
+  $shorewall_backuphost  = false,
+  $config_content        = undef,
+  $target_directory_mode = '0600',
 ) {
   include ::ibackup::simpledisks
 
@@ -58,10 +59,11 @@ class ibackup::simplebackup(
 
   $public_key = split($ssh_keys[1],' ')
   @@ibackup::target{$::fqdn:
-    sshkey        => $public_key[1],
-    user_password => $user_password,
-    target        => "${disk_target}/${$::fqdn}",
-    tag           => $backup_host,
+    sshkey         => $public_key[1],
+    user_password  => $user_password,
+    target         => "${disk_target}/${$::fqdn}",
+    directory_mode => $target_directory_mode,
+    tag            => $backup_host,
   }
 
   Sshkey <<| tag == $backup_host |>>

@@ -11,6 +11,7 @@ define ibackup::target(
   $sshkey                 = 'absent',
   $user_password          = 'absent',
   $user_password_crypted  = true,
+  $directory_mode         = '0600',
 ){
 
   if ($ensure=='present') and
@@ -57,7 +58,7 @@ define ibackup::target(
       require => User[$name],
       owner   => $name,
       group   => 0,
-      mode    => '0600',
+      mode    => $directory_mode,
     }
     sshd::authorized_key{"backupkey_${name}":
       ensure  => $ensure,
