@@ -28,9 +28,9 @@ class ibackup::simplebackup(
       group  => 0,
       mode   => '0700';
     '/e/backup/bin/ext_backup.config':
-      owner   => root,
-      group   => 0,
-      mode    => '0600';
+      owner => root,
+      group => 0,
+      mode  => '0600';
   }
   if $config_content {
     File['/e/backup/bin/ext_backup.config']{
