@@ -1,19 +1,10 @@
 # a backup host
-class ibackup::host(
-  $backup_domain = "backup.${domain}",
-) {
+class ibackup::host {
   include rsync::rrsync
 
   group{'backup':
     ensure => present,
   }
 
-  Ibackup::Target<<| tag == $backup_domain |>>
-
-  @@sshkey{$backup_domain:
-    type   => 'ssh-rsa',
-    key    => $sshrsakey,
-    ensure => present,
-    tag    => $backup_domain,
-  }
+  Ibackup::Target<<| tag == $facts['fqdn'] |>>
 }

@@ -4,20 +4,18 @@
 class ibackup::simplebackup(
   $backup_host,
   $type,
+  $firewall_backuphosts,
   $ssh_key_basepath      = '/etc/puppet/modules/site_securefile/files',
   $disk_target           = '/srv/backups',
   $user_password         = 'absent',
-  $shorewall_backuphost  = false,
   $config_content        = undef,
   $target_directory_mode = '0600',
 ) {
-  include ::ibackup::simpledisks
+  include ibackup::simpledisks
 
-  include ::rsync::client
-  if $shorewall_backuphost {
-    class{'::shorewall::rules::out::ibackup':
-      backup_host => $shorewall_backuphost,
-    }
+  include rsync::client
+  class{'firewall::rules::out::ibackup':
+    backup_hosts => $firewall_backuphosts,
   }
 
   file{
@@ -66,25 +64,10 @@ class ibackup::simplebackup(
     tag            => $backup_host,
   }
 
-  Sshkey <<| tag == $backup_host |>>
-
-  case $::kernel {
-    default: {
-      file{'/etc/cron.daily/ext_backup':
-        ensure  => link,
-        target  => '/e/backup/bin/ext_backup',
-        require => [ Securefile::Deploy["${backup_host}_ssh_key"],
-          File['/e/backup/bin/ext_backup'] ],
-      }
-    }
-    'openbsd': {
-      cron { 'ibackup_job':
-        command => '/e/backup/bin/ext_backup',
-        minute  => '15',
-        hour    => '2',
-        require => [ Securefile::Deploy["${backup_host}_ssh_key"],
-          File['/e/backup/bin/ext_backup'] ],
-      }
-    }
+  file{'/etc/cron.daily/ext_backup':
+    ensure  => link,
+    target  => '/e/backup/bin/ext_backup',
+    require => [ Securefile::Deploy["${backup_host}_ssh_key"],
+      File['/e/backup/bin/ext_backup'] ],
   }
 }
